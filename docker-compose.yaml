@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+
+  golang-kafka:
+    image: mertcakmak2/golang-kafka
+    container_name: golang-kafka
+    restart: "no"
+    ports:
+      - 8080:8080
+
+  zookeeper:
+    image: bitnami/zookeeper
+    container_name: zookeeper
+    restart: "no"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: bitnami/kafka
+    container_name: kafka
+    restart: "no"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_BROKER_ID=1
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - 9092:9092
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: "no"
+    environment:
+      - KAFKA_BROKERCONNECT=kafka:9092
+      - JVM_OPTS= -Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify
+    ports:
+      - 9000:9000
